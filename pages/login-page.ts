@@ -7,12 +7,15 @@ export class LoginPage {
         this.page = page;
     }
     
-    async goToWebsite() {
+    async navigateToMerchandiseWeb() {
         await this.page.goto('https://merchandise-dev.odds.team/');
     }
 
-    async userNameAndPasswordField(userName: string, password: string) {
+    async fillUsername(userName: string) {
         await this.page.locator('data-testid=login-field').fill(userName);
+    }
+
+    async fillPassword(password: string) {
         await this.page.locator('data-testid=password-field').fill(password);
     }
 

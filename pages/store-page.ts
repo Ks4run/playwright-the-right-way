@@ -7,8 +7,36 @@ export class StorePage {
         this.page = page;
     }
 
-    async selectProductAddToCartNumberOfList(index: number) {
+    async productWillBeShow(index: number) {
+        await expect(this.page.getByTestId('sku').nth(index)).toBeVisible();
+        await expect(this.page.getByTestId('title').nth(index)).toBeVisible();
+        await expect(this.page.getByTestId('price').nth(index)).toBeVisible();
+        await expect(this.page.getByTestId('add-to-cart-button').nth(index)).toBeVisible();
+    }
+
+    async verifyProductPrice(index: number, sku: string, nameProduct: string, price: string) {
+        await expect(this.page.getByTestId('sku').nth(index)).toHaveText(sku);
+        await expect(this.page.getByTestId('title').nth(index)).toHaveText(nameProduct);
+        await expect(this.page.getByTestId('price').nth(index)).toHaveText(price);
+    }
+
+    async clickAddToCartButton(index: number) {
         await this.page.getByTestId('add-to-cart-button').nth(index).click();
+    }
+    async clickRemoveFromCartButton(index: number) {
+        await this.page.getByTestId('remove-from-cart-button').nth(index).click();
+    }
+
+    async verifyNumberOfCart(item: string) {
+        await expect(this.page.getByTestId('cart-items-count')).toHaveText(item);
+    }
+
+    async clickNextPageButton() {
+        await this.page.getByTestId('next-page-button').click();
+    }
+
+    async verifyCurrentPage(page: string) {
+        await expect(this.page.getByTestId('cart-current-page-label-count')).toHaveText(page);
     }
 
     async openShoppingCart() {
