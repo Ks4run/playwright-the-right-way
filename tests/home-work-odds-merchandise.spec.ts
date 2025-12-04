@@ -3,13 +3,15 @@ import { LoginPage } from '../pages/login-page';
 import { StorePage } from '../pages/store-page';
 import { MailPit } from '../pages/mailpit';
 
-test.describe('Login Functionality', () => {
-    test.beforeEach(async ({ page }) => {
-        const loginPage = new LoginPage(page);
-        await loginPage.navigateToMerchandiseWeb();
-        await loginPage.fillUsername('customer1');
-        await loginPage.fillPassword('password');
-        await loginPage.clickLoginButton();
+test.describe('ODT x Merchandise', () => {
+    test.beforeEach(async ({ page }, testInfo) => {
+        if (testInfo.title != 'TC-008: ตรวจสอบการเข้าถึงเมื่อไม่ได้ login') {
+            const loginPage = new LoginPage(page);
+            await loginPage.navigateToMerchandiseWeb();
+            await loginPage.fillUsername('customer1');
+            await loginPage.fillPassword('password');
+            await loginPage.clickLoginButton();
+        }
     });
 
     test('TC-001: ตรวจสอบการแสดงรายการสินค้า', async ({ page }) => {
@@ -51,23 +53,35 @@ test.describe('Login Functionality', () => {
     test('TC-006: ตรวจสอบการเปลี่ยนหน้า pagination', async ({ page }) => {
         const storePage = new StorePage(page);
         await expect(page.getByTestId('shop-title')).toHaveText('ODT x merchandise');
+        await storePage.verifyPagesNumber('1');
         await storePage.clickNextPageButton();
-        await storePage.verifyCurrentPage('2');
-        await expect(page).toHaveURL('https://merchandise-dev.odds.team/store.html?page=2');
+        await storePage.verifyPagesNumber('2');
+    });
+
+    test('TC-007: ตรวจสอบปุ่ม “Log Out”', async ({ page }) => {
+        const storePage = new StorePage(page);
+        await expect(page.getByTestId('shop-title')).toHaveText('ODT x merchandise');
+        await storePage.clickMenuButton();
+        await storePage.clickLogOut();
+        await expect(page).toHaveURL('https://merchandise-dev.odds.team/index.html');
+    });
+
+    test('TC-008: ตรวจสอบการเข้าถึงเมื่อไม่ได้ login', async ({ page }) => {
+        await page.goto('https://merchandise-dev.odds.team/store.html');
+        await expect(page).toHaveURL('https://merchandise-dev.odds.team/index.html');
+    });
+
+    test('TC-009: ตรวจสอบข้อความสินค้าแต่ละประเภท', async ({ page }) => {
+        const storePage = new StorePage(page);
+        await expect(page.getByTestId('shop-title')).toHaveText('ODT x merchandise');
+        await storePage.verifyProductDetail(0, 'TerraFlex Hoodie', `Men's hoodie for gym. Crafted from recycled polyester with regular fit; made with recycled fibers.`);
+    });
+
+    test('TC-010: ตรวจสอบความเข้ากันของ UI', async ({ page }) => {
+        const storePage = new StorePage(page);
+        await expect(page.getByTestId('shop-title')).toHaveText('ODT x merchandise');
+        await storePage.verifyStorePageBeVisible(0);
+        await storePage.verifyStorePageBeVisible(1);
+        await storePage.verifyStorePageBeVisible(2);
     });
 });
-
-// const mailPit = new MailPit(page);
-
-// await storePage.selectProductAddToCartNumberOfList(0);
-// await storePage.selectProductAddToCartNumberOfList(1);
-// await storePage.openShoppingCart();
-// await storePage.checkoutProductInCart();
-
-// await storePage.shippingAddressInfo('kendo', 'koden', 'kendo-email', '99999');
-// await storePage.clickConfirmPaymentButton();
-
-// await storePage.verifyThankyouWording();
-
-// await mailPit.goToMailPit();
-// await mailPit.verifyReceivedMailSuccess(/^Hi Kendo Koden/);

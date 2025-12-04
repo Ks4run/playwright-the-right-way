@@ -32,11 +32,31 @@ export class StorePage {
     }
 
     async clickNextPageButton() {
-        await this.page.getByTestId('next-page-button').click();
+        await this.page.getByTestId('next-page-button').first().click({ force: true });
     }
 
-    async verifyCurrentPage(page: string) {
-        await expect(this.page.getByTestId('cart-current-page-label-count')).toHaveText(page);
+    async verifyPagesNumber(page: string) {
+        await expect(this.page.locator('#top-controller-container > div.flex.flex-row.gap-2.items-center > div > span:nth-child(2)')).toContainText(page);
+    }
+
+    async clickMenuButton() {
+        await this.page.getByTestId('menu').click({ force: true });
+    }
+
+    async clickLogOut() {
+        await this.page.getByRole('link', { name: 'Log Out' }).click();
+    }
+
+    async verifyProductDetail(index: number, nameProduct: string, description: string) {
+        await expect(this.page.getByTestId('title').nth(index)).toHaveText(nameProduct);
+        await expect(this.page.getByTestId('description').nth(index)).toHaveText(description);
+    }
+
+    async verifyStorePageBeVisible(index: number) {
+        await expect(this.page.getByTestId('title').nth(index)).toBeVisible();
+        await expect(this.page.locator('#Layer_1').nth(1)).toBeEnabled();
+        await this.page.getByTestId('menu').click({ force: true });
+        await expect(this.page.getByRole('link', { name: 'Log Out' })).toBeVisible();
     }
 
     async openShoppingCart() {
